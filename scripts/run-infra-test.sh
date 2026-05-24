@@ -3,7 +3,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-export AIMARKET_SKIP_DEMO_SEED=1
+export AIMARKET_SKIP_SEED=1
 export MESH_ENV=production
 export MESH_ALLOW_INSECURE_TOKENS=1
 export MESH_HUB_URL=http://127.0.0.1:9080

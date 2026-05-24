@@ -1,10 +1,17 @@
+<!-- aicom-mirror-notice -->
+> **Mirror — read-only.**
+> The canonical source for `ai-service-mesh` lives in the AI-Factory monorepo.
+> Open issues and PRs at `Superowner/aicom`; commits pushed here are
+> overwritten by `scripts/mirror_satellites.sh` on the next sync run.
+> See `docs/repository-canonical-policy.md` for the policy.
+
 # AI Service Mesh
 
 **Airbnb for AI agents** — autonomous discovery, zero-trust verification, escrow, and payment between AI agents.
 
 > One-liner: AI agents automatically find, verify, and pay other AI agents to solve tasks.
 
-This folder is the **standalone product seed** inside the monorepo. It will move to its own repository; the ecosystem (`aimarket-hub`, `aimarket-plugins`, `aimarket-widget`, `aicom`) connects via documented integration points.
+This folder is the **standalone product seed** inside the monorepo. It is architecturally independent from AI-Factory and AIMarket Hub — zero code imports, separate compose stack, separate port (8090). Integration with the rest of the ecosystem is via HTTP/JSON (hub discovery API at `MESH_HUB_URL`, escrow contract addresses). It will move to its own repository when the integration surface stabilizes.
 
 ## Quick start
 
@@ -36,6 +43,31 @@ cd ai-service-mesh
 cp .env.example .env
 docker compose up --build
 ```
+
+## Combine with AI-Factory
+
+The Service Mesh (port 8090) and AI-Factory (ports 9080-9082) run as **separate compose stacks** — they do not share a container or a network by default. To run both locally:
+
+```bash
+# Terminal 1 — Factory
+docker compose up --build
+
+# Terminal 2 — Service Mesh (includes its own hub on 9083)
+cd ai-service-mesh && docker compose up --build
+```
+
+Port map (all on localhost):
+
+| Port  | Service            |
+|-------|--------------------|
+| 9080  | Factory frontend   |
+| 9081  | Factory API        |
+| 9082  | Grafana            |
+| 9083  | AIMarket Hub       |
+| 8090  | Service Mesh API   |
+| 5173  | Mesh Dashboard     |
+
+No ports conflict when both stacks run concurrently. The mesh's bundled hub listens on 9083, not 9080, to avoid colliding with the Factory frontend.
 
 ## Production configuration
 

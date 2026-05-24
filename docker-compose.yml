@@ -4,9 +4,9 @@ services:
       context: ../aimarket-hub
       dockerfile: Dockerfile
     ports:
-      - "9080:9080"
+      - "9083:9083"
     environment:
-      AIMARKET_SKIP_DEMO_SEED: "1"
+      AIMARKET_SKIP_SEED: "1"
       AIFACTORY_PUBLIC_URL: ${AIFACTORY_PUBLIC_URL:-}
     volumes:
       - hub_data:/data
@@ -36,7 +36,7 @@ services:
       MESH_ENV: production
       MESH_PORT: 8090
       MESH_CORS_ORIGINS: http://localhost:5173
-      MESH_HUB_URL: http://aimarket-hub:9080
+      MESH_HUB_URL: http://aimarket-hub:9083
       MESH_SKIP_DEMO_CAPABILITIES: "true"
       MESH_REJECT_DEMO_INVOKE_OUTPUT: "true"
       MESH_API_TOKEN: ${MESH_API_TOKEN:?Set MESH_API_TOKEN — do not use default dev tokens in Docker}
