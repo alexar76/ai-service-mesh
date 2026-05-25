@@ -1,0 +1,32 @@
+# Production Mesh API on the AI-Factory host (Hub already on :9083).
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Requires MESH_API_TOKEN and MESH_ADMIN_TOKEN in parent ../.env
+
+services:
+  mesh-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aicom-mesh-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8090"
+    env_file:
+      - path: ../.env
+        required: false
+    environment:
+      MESH_ENV: production
+      MESH_PORT: 8090
+      MESH_HOST: 0.0.0.0
+      MESH_HUB_URL: ${MESH_HUB_URL:-http://127.0.0.1:9083}
+      MESH_SKIP_DEMO_CAPABILITIES: "true"
+      MESH_REJECT_DEMO_INVOKE_OUTPUT: "true"
+      MESH_CORS_ORIGINS: ${MESH_CORS_ORIGINS:-https://magic-ai-factory.com,http://127.0.0.1:9100}
+      MESH_DATA_DIR: /data
+    volumes:
+      - mesh_prod_data:/data
+
+volumes:
+  mesh_prod_data:
