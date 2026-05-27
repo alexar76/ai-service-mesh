@@ -211,6 +211,10 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
             raise HTTPException(status_code=404, detail="Task not found")
         return task
 
+    async def _create_task_impl(body: TaskCreateRequest) -> TaskOut:
+        task = store.create_task(body.intent, body.budget_usd, body.consumer_agent_id)
+        return await orchestrator.run_task(task, body.preferred_capabilities)
+
     @app.post("/v1/tasks", response_model=TaskOut, status_code=201)
     async def create_task(
         request: Request,
@@ -219,9 +223,13 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     ) -> TaskOut:
         _rate(request)
         _require_api(authorization, write=True)
-        task = store.create_task(body.intent, body.budget_usd, body.consumer_agent_id)
-        task = await orchestrator.run_task(task, body.preferred_capabilities)
-        return task
+        return await _create_task_impl(body)
+
+    @app.post("/v1/ui/tasks", response_model=TaskOut, status_code=201)
+    async def create_task_ui(request: Request, body: TaskCreateRequest) -> TaskOut:
+        """Browser UI BFF — no client bearer; rate-limited same-origin writes only."""
+        _rate(request)
+        return await _create_task_impl(body)
 
     @app.get("/v1/activity", response_model=list[ActivityEventOut])
     async def activity(

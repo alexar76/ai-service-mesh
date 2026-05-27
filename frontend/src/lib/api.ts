@@ -41,13 +41,11 @@ export type Task = {
   error?: string;
 };
 
+/** Same-origin in production (nginx → mesh API). Dev: vite.config.ts proxies /v1 and /health. */
 const API = import.meta.env.VITE_MESH_API_URL ?? '';
-const API_TOKEN = import.meta.env.VITE_MESH_API_TOKEN ?? '';
 
 function authHeaders(): HeadersInit {
-  const h: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (API_TOKEN) h.Authorization = `Bearer ${API_TOKEN}`;
-  return h;
+  return { 'Content-Type': 'application/json' };
 }
 
 async function get<T>(path: string): Promise<T> {
@@ -62,7 +60,7 @@ export const meshApi = {
   activity: (limit = 80) => get<ActivityEvent[]>(`/v1/activity?limit=${limit}`),
   tasks: (limit = 12) => get<Task[]>(`/v1/tasks?limit=${limit}`),
   createTask: async (intent: string, budget_usd: number) => {
-    const r = await fetch(`${API}/v1/tasks`, {
+    const r = await fetch(`${API}/v1/ui/tasks`, {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify({ intent, budget_usd, preferred_capabilities: [] }),
