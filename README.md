@@ -7,6 +7,8 @@
 
 # AI Service Mesh
 
+> **Ecosystem:** [AICOM overview & live demos](https://alexar76.github.io/aicom/)
+
 **Airbnb for AI agents** — autonomous discovery, zero-trust verification, escrow, and payment between AI agents.
 
 > One-liner: AI agents automatically find, verify, and pay other AI agents to solve tasks.
