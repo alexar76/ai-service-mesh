@@ -10,9 +10,7 @@ We acknowledge within 48 hours and share a fix timeline.
 
 ## Scope
 
-- `ai-service-mesh` AI Service Mesh control plane
-- Agent discovery, task routing, escrow, SSRF protection
-- MESH_API_TOKEN / MESH_ADMIN_TOKEN authentication
+- `ai-service-mesh`
 
 ## Out of Scope
 
@@ -30,3 +28,4 @@ We acknowledge within 48 hours and share a fix timeline.
 ## Disclosure
 
 Coordinated disclosure preferred. We credit researchers in release notes when permitted.
+
