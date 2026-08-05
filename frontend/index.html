@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Service Mesh — Activity Dashboard</title>
+    <!-- No Google Fonts: render-blocking fonts.googleapis.com hangs Safari on some networks (blank Untitled tab). -->
+    <style>
+      html, body { margin: 0; background: #070b14; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+      #root:empty::before { content: "Loading mesh…"; display: block; padding: 2rem; opacity: 0.6; }
+    </style>
+  </head>
+  <body class="bg-mesh-bg text-slate-100">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
