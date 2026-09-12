@@ -1,0 +1,13 @@
+# Local dev override:
+#  - hub build context must be the MONOREPO ROOT (its Dockerfile COPYs aimarket-hub/, acex/,
+#    plugins/, aimarket-protocol/ — all root-relative). The committed `context: ../aimarket-hub`
+#    is wrong for this Dockerfile, so override it here.
+#  - mesh-api host port off the occupied 8090.
+services:
+  aimarket-hub:
+    build:
+      context: ..
+      dockerfile: aimarket-hub/Dockerfile
+  mesh-api:
+    ports: !override
+      - "127.0.0.1:8095:8090"

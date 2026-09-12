@@ -1,0 +1,51 @@
+# Production Mesh API on the AI-Factory host (Hub already on :9083).
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Requires MESH_API_TOKEN and MESH_ADMIN_TOKEN in ./.env (this directory, NOT the monorepo root)
+
+services:
+  mesh-api:
+    image: aicom-mesh-api:${AICOM_IMAGE_TAG:-local}
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aicom-mesh-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8090"
+    # NO `env_file: ../.env`. That line loaded the ENTIRE monorepo .env into this
+    # container — measured live on 2026-09-11: 21 variables the mesh never reads, among
+    # them ATLAS_SIGNING_SEED_B64 (the ATLAS federation identity), ATLAS_OPERATOR_TOKEN,
+    # AIFACTORY_FIREWALL_RULES_FERNET_KEY, AIFACTORY_DEV_BOOTSTRAP_PASSWORD,
+    # DEEPSEEK_API_KEY, GRAFANA_ADMIN_PASSWORD, POSTGRES_PASSWORD, REDIS_PASSWORD and
+    # AIFACTORY_RESELLER_KEYS. An SSRF or code-execution bug in a 2.4k-line service would
+    # have handed over the factory's and ATLAS's secrets. The mesh gets exactly the
+    # variables it declares in config.Settings, interpolated from ./.env (compose reads
+    # the project directory's .env for ${...} substitution without injecting it).
+    environment:
+      MESH_ENV: production
+      MESH_PORT: 8090
+      MESH_HOST: 0.0.0.0
+      MESH_API_TOKEN: ${MESH_API_TOKEN:?MESH_API_TOKEN must be set in ai-service-mesh/.env}
+      MESH_ADMIN_TOKEN: ${MESH_ADMIN_TOKEN:?MESH_ADMIN_TOKEN must be set in ai-service-mesh/.env}
+      MESH_HUB_URL: ${MESH_HUB_URL:-http://127.0.0.1:9083}
+      MESH_SKIP_DEMO_CAPABILITIES: "true"
+      MESH_REJECT_DEMO_INVOKE_OUTPUT: "true"
+      MESH_PUBLIC_READ: ${MESH_PUBLIC_READ:-0}
+      MESH_ALLOW_LOCALHOST_AGENTS: ${MESH_ALLOW_LOCALHOST_AGENTS:-0}
+      MESH_DATABASE_URL: ${MESH_DATABASE_URL:-}
+      MESH_CORS_ORIGINS: ${MESH_CORS_ORIGINS:-https://magic-ai-factory.com,https://monitor.modelmarket.dev,http://127.0.0.1:9100}
+      # This overlay is only ever fronted by deploy/nginx/service-mesh.modelmarket.dev.conf
+      # (the port is bound to loopback), and that nginx sets X-Forwarded-For with
+      # $proxy_add_x_forwarded_for. Without this the limiter keyed every request on the
+      # proxy's address — one 120/min bucket for the whole internet.
+      MESH_TRUST_FORWARDED_FOR: "1"
+      # Largest agent/hub reply the mesh will buffer (bytes). See config.max_response_bytes.
+      MESH_MAX_RESPONSE_BYTES: ${MESH_MAX_RESPONSE_BYTES:-1048576}
+      MESH_DATA_DIR: /data
+    volumes:
+      - mesh_prod_data:/data
+
+volumes:
+  mesh_prod_data:
