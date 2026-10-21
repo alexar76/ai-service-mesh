@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "ai-service-mesh"
 version = "0.1.0"
 description = "AI Service Mesh — agents discover, verify, and pay other agents autonomously"
+readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.11"
 dependencies = [
@@ -16,6 +17,11 @@ dependencies = [
     "pydantic-settings>=2.7",
     "cryptography>=44",
 ]
+
+[project.urls]
+Homepage = "https://service-mesh.modelmarket.dev/"
+Repository = "https://github.com/alexar76/ai-service-mesh"
+Issues = "https://github.com/alexar76/ai-service-mesh/issues"
 
 [project.optional-dependencies]
 postgres = ["psycopg[binary,pool]>=3.2"]
