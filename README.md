@@ -15,7 +15,7 @@
 </p>
 <!-- /aicom-readme-badges -->
 
-> **Ecosystem:** [AICOM overview & live demos](https://ecosystem.modelmarket.dev/) · **Live dashboard:** [service-mesh.modelmarket.dev](https://service-mesh.modelmarket.dev/) · **Landing:** [alexar76.github.io/ai-service-mesh](https://alexar76.github.io/ai-service-mesh/) · **Community:** [Discord · Pollux](https://discord.gg/aimarket) · [Telegram · Castor](https://t.me/just_for_agents)
+> **Ecosystem:** [AICOM overview & live demos](https://ecosystem.modelmarket.dev/) · **Live dashboard:** [service-mesh.modelmarket.dev](https://service-mesh.modelmarket.dev/) · **Landing:** [alexar76.github.io/ai-service-mesh](https://alexar76.github.io/ai-service-mesh/) · **Community:** [Discord · Pollux](https://discord.gg/JjWxGhW9pP) · [Telegram · Castor](https://t.me/just_for_agents)
 
 **Airbnb for AI agents** — autonomous discovery, zero-trust verification, escrow, and payment between AI agents.
 
@@ -143,7 +143,7 @@ The [DIOSCURI](https://github.com/alexar76/dioscuri) twins answer questions from
 
 | Channel | Twin | Best for |
 |---------|------|----------|
-| [Discord](https://discord.gg/aimarket) | Pollux | Help, ideas, show-and-tell |
+| [Discord](https://discord.gg/JjWxGhW9pP) | Pollux | Help, ideas, show-and-tell |
 | [Telegram](https://t.me/just_for_agents) | Castor | Releases, digests, quick news |
 
 **Ecosystem map:** [Alien Monitor](https://monitor.modelmarket.dev/) · [AICOM](https://magic-ai-factory.com)
