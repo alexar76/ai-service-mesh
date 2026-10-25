@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import hmac
+import hashlib
 import ipaddress
 import re
 import socket
@@ -32,6 +33,17 @@ INSECURE_DEFAULT_TOKENS = frozenset(
         "change-me-admin",
     }
 )
+
+
+# Public Lottery v0.1.0 retained an actual admin credential. Deny the exact
+# fingerprint independently of deployment mode or the local-default override.
+COMPROMISED_TOKEN_SHA256 = frozenset({
+    "5b023816d239f5431323c6eef7d07d3ba3af7c0f9a77a6009821b0d321f7378c",
+})
+
+
+def _compromised_token(value: str) -> bool:
+    return hashlib.sha256(value.strip().encode("utf-8")).hexdigest() in COMPROMISED_TOKEN_SHA256
 
 
 def _ip_blocked(addr: str) -> bool:
@@ -138,7 +150,7 @@ async def url_is_safe_async(url: str, *, allow_localhost: bool = False) -> bool:
 
 
 def require_bearer(authorization: str, expected: str, *, disabled_detail: str) -> None:
-    if not expected:
+    if not expected or _compromised_token(expected):
         raise HTTPException(status_code=503, detail=disabled_detail)
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing Bearer token")
@@ -154,6 +166,8 @@ def assert_production_tokens(
     *,
     allow_insecure_tokens: bool = False,
 ) -> None:
+    if _compromised_token(api_token) or _compromised_token(admin_token):
+        raise RuntimeError("A Mesh credential was publicly exposed; configure a replacement")
     if env != "production" or allow_insecure_tokens:
         return
     if api_token in INSECURE_DEFAULT_TOKENS or admin_token in INSECURE_DEFAULT_TOKENS:
