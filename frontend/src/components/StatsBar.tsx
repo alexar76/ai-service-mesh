@@ -24,7 +24,7 @@ export function StatsBar({ stats }: { stats: MeshStats }) {
       {cards.map(({ key, labelKey, format }) => (
         <div
           key={key}
-          className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-4"
+          className="rounded-2xl border border-white/10 bg-linear-to-b from-white/6 to-transparent p-4"
         >
           <p className="text-[11px] uppercase tracking-wider text-slate-500 mb-1">{t(labelKey)}</p>
           <p className="font-display text-2xl font-bold text-white tabular-nums">

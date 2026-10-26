@@ -146,7 +146,7 @@ export default function App() {
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               <ActivityFeed events={activity} />
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <div className="rounded-2xl border border-white/10 bg-white/3 p-5">
                 <h2 className="font-display text-lg font-semibold text-white mb-4">{t('recent_tasks')}</h2>
                 <ul className="space-y-3">
                   {tasks.length === 0 && (

@@ -364,7 +364,7 @@ export function MeshLiveScene({
   const hovered = hover ? byId.get(hover) : null;
 
   return (
-    <section className="relative overflow-hidden rounded-none border-y border-teal-500/15 bg-[#041210]/[0.65]">
+    <section className="relative overflow-hidden rounded-none border-y border-teal-500/15 bg-mesh-bg/65">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(30,201,168,0.08),transparent_60%)]" />
       <div className="relative mx-auto max-w-7xl px-4 pt-5 pb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
@@ -402,7 +402,7 @@ export function MeshLiveScene({
           onMouseLeave={() => setHover(null)}
         />
         {hovered && !hovered.isHub && (
-          <div className="pointer-events-none absolute left-6 bottom-8 rounded-xl border border-white/10 bg-black/70 backdrop-blur px-4 py-3 max-w-xs">
+          <div className="pointer-events-none absolute left-6 bottom-8 rounded-xl border border-white/10 bg-black/70 backdrop-blur-sm px-4 py-3 max-w-xs">
             <p className="font-display text-sm text-white">{hovered.label}</p>
             <p className="text-xs text-slate-400 mt-1">{hovered.sub}</p>
             <p className="text-[11px] font-mono text-teal-300 mt-2">

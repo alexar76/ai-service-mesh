@@ -21,7 +21,7 @@ export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
   const { t } = useLocale();
   const sorted = [...events].reverse();
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden">
+    <div className="rounded-2xl border border-white/10 bg-white/3 overflow-hidden">
       <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
         <h2 className="font-display text-lg font-semibold text-white">{t('activity')}</h2>
         <span className="text-xs text-slate-500 font-mono">
@@ -33,7 +33,7 @@ export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
           <li className="px-5 py-8 text-sm text-slate-500 text-center">{t('waiting')}</li>
         )}
         {sorted.map((ev) => (
-          <li key={ev.id} className="px-5 py-3 hover:bg-white/[0.02] transition">
+          <li key={ev.id} className="px-5 py-3 hover:bg-white/2 transition">
             <div className="flex flex-wrap items-start gap-2 mb-1">
               <span
                 className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-full border ${kindClass(ev.kind)}`}

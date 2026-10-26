@@ -4,7 +4,7 @@ import { useLocale } from '../i18n/LocaleContext';
 export function AgentGrid({ agents }: { agents: Agent[] }) {
   const { t } = useLocale();
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+    <div className="rounded-2xl border border-white/10 bg-white/3 p-5">
       <h2 className="font-display text-lg font-semibold text-white mb-4">{t('verified_agents')}</h2>
       <ul className="space-y-3">
         {agents.map((a) => (
