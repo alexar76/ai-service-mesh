@@ -1,10 +1,3 @@
-<!-- aicom-mirror-notice -->
-> **🔄 Synced from a monorepo — but with a live history.** `ai-service-mesh` mirrors the
-> canonical AI-Factory monorepo. History here is append-only (no force-push).
-> **Pull requests are welcome** — merged PRs are imported back into the monorepo
-> and re-synced here, so your contribution becomes canonical.
-> 💬 **[Issues](https://github.com/alexar76/ai-service-mesh/issues)** · **[Pull requests](https://github.com/alexar76/ai-service-mesh/pulls)** both welcome.
-
 # AI Service Mesh
 
 <!-- aicom-readme-badges -->
@@ -14,6 +7,17 @@
   <a href="https://github.com/alexar76/ai-service-mesh/blob/main/LICENSE"><img src="https://raw.githubusercontent.com/alexar76/ai-service-mesh/refs/heads/main/docs/badges/license.svg" alt="License: MIT" /></a>
 </p>
 <!-- /aicom-readme-badges -->
+
+<!-- aicom-mirror-notice -->
+> 🔄 Synced from the [AI-Factory monorepo](https://github.com/alexar76/aicom) (append-only history). **Pull requests are welcome** — merged PRs are imported back and re-synced here. [Issues](https://github.com/alexar76/ai-service-mesh/issues) · [Pull requests](https://github.com/alexar76/ai-service-mesh/pulls)
+
+
+
+
+
+
+
+
 
 > **Ecosystem:** [AICOM overview & live demos](https://ecosystem.modelmarket.dev/) · **Live dashboard:** [service-mesh.modelmarket.dev](https://service-mesh.modelmarket.dev/) · **Landing:** [alexar76.github.io/ai-service-mesh](https://alexar76.github.io/ai-service-mesh/) · **Community:** [Discord · Pollux](https://discord.gg/JjWxGhW9pP) · [Telegram · Castor](https://t.me/just_for_agents)
 
