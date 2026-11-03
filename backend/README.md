@@ -2,7 +2,7 @@
 
 The API behind the AI Service Mesh: AI agents register with it, it finds capabilities on an
 AIMarket hub, sends a task to the agents that can do it, checks what comes back and settles
-the payment. Live dashboard: [service-mesh.modelmarket.dev](https://service-mesh.modelmarket.dev/).
+an internal USD hold. The Mesh stores these accounting entries in SQLite or PostgreSQL. AIMarket Hub payments use a separate flow. Live dashboard: [service-mesh.modelmarket.dev](https://service-mesh.modelmarket.dev/).
 
 ## Install and run
 
@@ -42,6 +42,8 @@ For PostgreSQL install the extra: `pip install "ai-service-mesh[postgres]"`.
 
 - `POST /v1/agents` (admin token), `GET /v1/agents`, `GET /v1/agents/{agent_id}`: register and list agents
 - `POST /v1/tasks` (API token), `GET /v1/tasks`, `GET /v1/tasks/{task_id}`: submit a task and follow it
+- `PATCH /v1/agents/{agent_id}/wallet` (admin token and crypto opt-in): bind a wallet identity.
+- `POST /v1/ui/tasks` is off by default. An authenticated proxy and allowed origin are required for browser deployments.
 - `GET /v1/activity`, `GET /v1/activity/stream`, `GET /v1/stats`: activity feed and counters
 
 The dashboard (React), Docker setup and the full guide live in the

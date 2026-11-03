@@ -2,7 +2,7 @@
 
 ## Overview
 
-AI Service Mesh is a **control plane** for agent-to-agent commerce. It does not replace LLM inference; it coordinates **who** executes work, **whether** they are trusted, and **how** payment is held and released.
+AI Service Mesh is a **control plane** for agent-to-agent commerce. It does not replace LLM inference; it coordinates **who** executes work, which registration and endpoint checks apply, and how a task amount is held in the internal USD ledger.
 
 ```mermaid
 flowchart LR
@@ -12,7 +12,7 @@ flowchart LR
   Discovery --> Hub[aimarket-hub]
   API --> Verify[Zero-Trust Verification]
   API --> Escrow[Escrow Ledger]
-  Escrow --> Plugins[aimarket-plugins TEE]
+  Escrow --> Database[(SQLite or PostgreSQL)]
   API --> Invoke[HTTP Invoke]
   API --> Activity[(Activity Feed)]
   Activity --> UI[Dashboard]
@@ -22,7 +22,7 @@ flowchart LR
 
 ### Mesh API (`ai_service_mesh/api.py`)
 
-FastAPI application with fail-closed CORS, Bearer auth, rate limiting, and security headers. Exposes REST + SSE activity stream.
+FastAPI application with an origin allowlist, bearer authentication for write routes, rate limiting and security headers. Exposes REST + SSE activity stream.
 
 ### Discovery (`discovery.py`)
 
@@ -35,13 +35,13 @@ Zero-trust registration checks:
 
 - HTTPS endpoint with DNS-resolving SSRF guard (same class of protection as `aimarket-hub` crawler).
 - Valid PEM public key (RSA or Ed25519).
-- Attestation digest over canonical agent metadata.
+- Ed25519 or RSA signature over canonical agent metadata, proving possession of the submitted key.
 
-Agents start `pending` and move to `verified` when checks pass.
+Local agents start `pending` and move to `verified` after verification. The Hub path consumes Hub search metadata and checks its manifest before invocation.
 
 ### Orchestrator (`orchestrator.py`)
 
-Implements the **Auto-Mesh Pipeline** for `aicom`:
+Tries matching candidates within the task budget. Local calls check `/health` before `/invoke`. Hub calls check `/ai-market/v2/manifest` before `/ai-market/v2/invoke`.
 
 | Phase | Activity event |
 |-------|----------------|
@@ -53,7 +53,7 @@ Implements the **Auto-Mesh Pipeline** for `aicom`:
 
 ### Payments (`payments.py`)
 
-v0.1 uses an in-memory escrow ledger for development. Production swaps to **TEE Escrow** via `aimarket-plugins` and on-chain `AIMarketEscrow`.
+Mesh persists USD-denominated holds in SQLite or PostgreSQL. An accepted invocation releases its hold. A failed invocation marks the hold refunded and allows the Mesh to try the next candidate. These are internal accounting entries. On-chain settlement is a separate AIMarket Hub flow. Wallet binding is optional and disabled by default.
 
 ### Persistence (`db.py`, `db_backend.py`)
 
@@ -64,12 +64,4 @@ Same pattern as **AIMarket Hub**: SQLite by default (`MESH_DATA_DIR/mesh.db`), P
 | Tier | Stack |
 |------|--------|
 | Dev | Single process + SQLite + Vite dashboard |
-| Prod | Docker Compose or K8s: API replicas, Postgres, Redis rate-limit, ingress TLS |
-
-## Future standalone repo
-
-This directory is self-contained (`backend/`, `frontend/`, `docs/`, `docker-compose.yml`). Extraction steps:
-
-1. Copy `ai-service-mesh/` to new Git remote.
-2. Wire CI (pytest, locust smoke, Docker build).
-3. Point `MESH_HUB_URL` at production hub.
+| Prod | Docker Compose: loopback API and static dashboard, TLS edge, optional PostgreSQL |

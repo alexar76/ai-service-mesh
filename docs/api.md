@@ -1,80 +1,43 @@
-# API Reference
+# AI Service Mesh API
 
-Base URL: `https://mesh.example.com` (dev: `http://127.0.0.1:8090`)
+Local API: `http://127.0.0.1:8090`. Interactive OpenAPI: `/docs`. The local Compose override maps the API to port 8095.
 
 ## Authentication
 
-| Endpoint group | Header |
-|----------------|--------|
-| Read (stats, agents, activity, tasks GET) | Optional `Authorization: Bearer <MESH_API_TOKEN>` in production |
-| `POST /v1/tasks` | Required `Bearer <MESH_API_TOKEN>` in production |
-| `POST /v1/agents` | Required `Bearer <MESH_ADMIN_TOKEN>` |
+| Routes | Access |
+|---|---|
+| `GET /health` | Public liveness probe. `MESH_HEALTH_VERBOSE=1` adds the storage backend. |
+| `GET /v1/agents`, `/v1/agents/{agent_id}`, `/v1/tasks`, `/v1/tasks/{task_id}`, `/v1/stats`, `/v1/activity`, `/v1/activity/stream` | Public when `MESH_PUBLIC_READ=1` (application default). When set to `0`, send `Authorization: Bearer <MESH_API_TOKEN>`. The production Compose template defaults to private reads. |
+| `POST /v1/tasks` | `Authorization: Bearer <MESH_API_TOKEN>` in every environment. |
+| `POST /v1/agents`, `PATCH /v1/agents/{agent_id}/wallet` | `Authorization: Bearer <MESH_ADMIN_TOKEN>`. Wallet binding also requires `AIFACTORY_CRYPTO_ENABLED=1`. |
+| `POST /v1/ui/tasks` | Disabled by default. An operator can enable this browser route with `MESH_ALLOW_UI_WRITES=1` behind an authenticated proxy. The request's `Origin` must appear in `MESH_CORS_ORIGINS`. |
 
-Development mode (`MESH_ENV=development`) allows open reads and writes when tokens are unset.
+## Register an agent
 
-## Endpoints
+Send `name`, `endpoint_url`, `public_key_pem`, `capabilities` and `attestation` to `POST /v1/agents`. Sign the UTF-8 bytes of `name|endpoint_url|cap1,cap2,...` with the private key corresponding to `public_key_pem`. Sort capabilities before joining them and omit a trailing slash from the endpoint. Use Ed25519 or RSA PKCS#1 v1.5 with SHA-256, then encode the signature as unpadded base64url. The Python helper is `ai_service_mesh.verification.build_attestation()`.
 
-### `GET /health`
+Inspect `status` on the 201 response. An agent with a missing or invalid signature stays `pending` and is excluded from local discovery. Use `GET /v1/agents?verified_only=true` to list verified local registrations.
 
-Liveness probe.
+A direct agent implements `GET /health` and `POST /invoke`. The invocation body is `{"input":{"intent":"…","query":"…"}}`; both fields carry the task's intent. For a Hub-routed agent, provide `product_id` and `capability_id`, and optionally `source_hub`.
 
-### `GET /v1/stats`
+## Submit a task
 
-Aggregated mesh metrics (24h window).
-
-### `GET /v1/agents`
-
-Query `verified_only=true` to list trusted agents.
-
-### `POST /v1/agents`
-
-Register agent (admin). Body:
+`POST /v1/tasks` accepts:
 
 ```json
 {
-  "name": "Research Scout",
-  "endpoint_url": "https://agent.example.com",
-  "public_key_pem": "-----BEGIN PUBLIC KEY-----\n...",
-  "capabilities": ["research", "summarize"],
-  "attestation": "<base64url sha256 canonical metadata>"
+  "intent": "summarize service health",
+  "budget_usd": 1.0,
+  "preferred_capabilities": ["summarize"]
 }
 ```
 
-Attestation canonical string: `{name}|{endpoint_url}|{sorted capabilities joined by comma}`
+A 201 response means the task was created and attempted. Read `status`, `error` and `hops[]` for the execution outcome. Hops include the phases `verify`, `escrow`, `invoke` and, on success, `settle`. `total_spent_usd` reports the internal Mesh ledger amount. `GET /v1/tasks?limit=50` lists recent tasks.
 
-### `POST /v1/tasks`
+## Monitor the Mesh
 
-Run full mesh pipeline. Body:
+- `GET /v1/stats` returns registry counts and 24-hour activity, success and ledger metrics.
+- `GET /v1/activity?limit=100&since_id=<event_id>` polls incremental events.
+- `GET /v1/activity/stream` sends server-sent events with one JSON object per `data:` entry.
 
-```json
-{
-  "intent": "research latest agent orchestration patterns",
-  "budget_usd": 5.0,
-  "consumer_agent_id": "agt_optional",
-  "preferred_capabilities": ["research"]
-}
-```
-
-Response includes `hops[]` with phases: `verify`, `escrow`, `invoke`, `settle`.
-
-### `GET /v1/activity`
-
-Query: `limit`, `since_id` for polling incremental events.
-
-### `GET /v1/activity/stream`
-
-Server-Sent Events (`text/event-stream`) — one JSON event per line.
-
-## Error codes
-
-| Code | Meaning |
-|------|---------|
-| 400 | Validation / SSRF blocked URL |
-| 401 | Missing Bearer |
-| 403 | Invalid token |
-| 429 | Rate limit |
-| 503 | Admin/API token not configured |
-
-## OpenAPI
-
-Interactive docs at `/docs` when the server is running.
+Common errors include 400 for an unsafe agent endpoint, 401 for missing credentials, 403 for invalid credentials or a disabled feature, 404 for an unknown ID, 422 for invalid input, 429 for rate limiting, and 503 when a required token is missing from server configuration.

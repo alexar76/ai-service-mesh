@@ -19,28 +19,35 @@
 
 
 
-> **Ecosystem:** [AICOM overview & live demos](https://ecosystem.modelmarket.dev/) · **Live dashboard:** [service-mesh.modelmarket.dev](https://service-mesh.modelmarket.dev/) · **Landing:** [alexar76.github.io/ai-service-mesh](https://alexar76.github.io/ai-service-mesh/) · **Community:** [Discord · Pollux](https://discord.gg/JjWxGhW9pP) · [Telegram · Castor](https://t.me/just_for_agents)
+**English** · [Русский](docs/README.ru.md) · [Español](docs/README.es.md) · [Français](docs/README.fr.md) · [简体中文](docs/README.zh.md)
 
-**Airbnb for AI agents** — autonomous discovery, zero-trust verification, escrow, and payment between AI agents.
+[Live dashboard](https://service-mesh.modelmarket.dev/) · [AICOM ecosystem](https://ecosystem.modelmarket.dev/) · [Landing](https://alexar76.github.io/ai-service-mesh/)
 
-> One-liner: AI agents automatically find, verify, and pay other AI agents to solve tasks.
+AI Service Mesh coordinates agent tasks. It searches verified local registrations and an optional AIMarket Hub, checks a candidate's endpoint, invokes the candidate, and records the result and USD hold in its database. The Mesh runs independently of AI-Factory and talks to the Hub over HTTP.
 
-This folder is the **standalone product seed** inside the monorepo. It is architecturally independent from AI-Factory and AIMarket Hub — zero code imports, separate compose stack, separate port (8090). Integration with the rest of the ecosystem is via HTTP/JSON (hub discovery API at `MESH_HUB_URL`, escrow contract addresses). It will move to its own repository when the integration surface stabilizes.
+Local registration uses a private-key signature. A direct call checks the agent's `/health` before `/invoke`. A Hub-routed call checks the Hub manifest before using its invocation endpoint. Mesh accounts for holds in SQLite or PostgreSQL. Hub payments and Base settlement run on separate rails.
 
 ## Quick start
 
 ### Backend (API)
 
+Requires Python 3.11 or newer. Run from the monorepo:
+
 ```bash
 cd ai-service-mesh/backend
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-MESH_ENV=development MESH_CORS_ORIGINS=http://localhost:5173 python -m ai_service_mesh.main
+export MESH_ENV=development MESH_HOST=127.0.0.1 MESH_HUB_URL=
+export MESH_API_TOKEN="$(openssl rand -hex 32)"
+export MESH_ADMIN_TOKEN="$(openssl rand -hex 32)"
+python -m ai_service_mesh.main
 ```
 
-API: [http://127.0.0.1:8090/health](http://127.0.0.1:8090/health) · OpenAPI: `/docs`
+API probe: [http://127.0.0.1:8090/health](http://127.0.0.1:8090/health). Interactive OpenAPI is at `/docs`. An empty `MESH_HUB_URL` keeps discovery local. See the [API reference](docs/api.md) for registering a signed agent and submitting a task.
 
 ### Dashboard (frontend)
+
+From the monorepo in a second terminal:
 
 ```bash
 cd ai-service-mesh/frontend
@@ -48,57 +55,27 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) — live activity feed, mesh topology, and task submission against real agents.
+Open [http://localhost:5173](http://localhost:5173) to inspect topology and activity. The browser task route is off by default. Submit tasks from the API with the bearer token. See [deployment](docs/deployment.md) for Compose ports and dashboard write configuration.
 
-### Docker
-
-```bash
-cd ai-service-mesh
-cp .env.example .env
-docker compose up --build
-```
-
-## Combine with AI-Factory
-
-The Service Mesh (port 8090) and AI-Factory (ports 9080-9082) run as **separate compose stacks** — they do not share a container or a network by default. To run both locally:
-
-```bash
-# Terminal 1 — Factory
-docker compose up --build
-
-# Terminal 2 — Service Mesh (includes its own hub on 9083)
-cd ai-service-mesh && docker compose up --build
-```
-
-Port map (all on localhost):
-
-| Port  | Service            |
-|-------|--------------------|
-| 9080  | Factory frontend   |
-| 9081  | Factory API        |
-| 9082  | Grafana            |
-| 9083  | AIMarket Hub       |
-| 8090  | Service Mesh API   |
-| 5173  | Mesh Dashboard     |
-
-No ports conflict when both stacks run concurrently. The mesh's bundled hub listens on 9083, not 9080, to avoid colliding with the Factory frontend.
-
-## Production configuration
+## Configuration
 
 | Variable | Description |
-|----------|-------------|
-| `MESH_API_TOKEN` | Bearer token for `POST /v1/tasks` |
-| `MESH_ADMIN_TOKEN` | Bearer token for `POST /v1/agents` |
-| `MESH_CORS_ORIGINS` | Comma-separated origins (empty = no CORS) |
-| `MESH_HUB_URL` | Optional `aimarket-hub` base URL for federated discovery |
-| `MESH_RATE_LIMIT` | Requests per minute per IP (default 120) |
+|---|---|
+| `MESH_API_TOKEN` | Bearer token for `POST /v1/tasks` and private reads |
+| `MESH_ADMIN_TOKEN` | Bearer token for registration and optional wallet binding |
+| `MESH_CORS_ORIGINS` | Comma-separated browser origins, default `http://localhost:5173` |
+| `MESH_PUBLIC_READ` | Application default `1`. Production Compose defaults to `0`. |
+| `MESH_ALLOW_UI_WRITES` | Browser task route, off by default. Enable only behind authenticated ingress. |
+| `MESH_HUB_URL` | AIMarket Hub for discovery and routing. Empty disables Hub discovery. |
+| `MESH_RATE_LIMIT` | Requests per minute per IP, default 120 |
+| `AIFACTORY_CRYPTO_ENABLED` | Optional wallet binding, off by default |
 
-See [docs/security.md](docs/security.md) and [.env.example](.env.example).
+See [security](docs/security.md) and [.env.example](.env.example).
 
 ## Mesh pipeline
 
 ```
-Task → Discovery → Zero-trust verify → Escrow → Invoke → Settle
+Task → Discovery → Preflight → Ledger hold → Invoke → Release or refund
 ```
 
 Each phase emits events on `/v1/activity` for the dashboard and external observability.
@@ -106,8 +83,11 @@ Each phase emits events on `/v1/activity` for the dashboard and external observa
 ## Tests
 
 ```bash
-cd backend && pytest -q
+cd ai-service-mesh/backend
+pytest -q -m 'not integration'
 ```
+
+The integration tests expect a running Mesh API, a local agent with signed registration, and matching API/admin tokens. The Hub demo-rejection test also needs a Hub with demo-only matches.
 
 Load tests (API must be running):
 
@@ -128,11 +108,10 @@ locust -f load/locustfile.py --host http://127.0.0.1:8090 --headless -u 20 -r 4 
 
 | Product | Capability | Mesh role |
 |---------|------------|-----------|
-| **aimarket-hub** | Zero-Trust Agent Discovery | Federated capability search |
+| **aimarket-hub** | Capability catalog and invocation API | Federated search and routed invocation |
 | **oracles** | Verifiable math (randomness, VDF, consensus, reputation) | Invokable capabilities on the hub catalog |
-| **aimarket-plugins** | TEE Escrow | Production escrow backend |
 | **aimarket-widget** | 1-Click Agent Embed | Embeddable consumer UI |
-| **aicom** | Auto-Mesh Pipeline | Factory orchestration source |
+| **aicom** | AI-Factory orchestration | Separate stack |
 | **dioscuri** | Twin community agents | MNEMOSYNE Q&A from synced GitHub docs |
 
 ## Demo
@@ -154,4 +133,4 @@ The [DIOSCURI](https://github.com/alexar76/dioscuri) twins answer questions from
 
 ## License
 
-Apache-2.0 (align with parent monorepo).
+Apache-2.0.

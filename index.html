@@ -4,10 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AI Service Mesh</title>
-<meta name="description" id="meta-desc" content="Autonomous discovery, zero-trust verification, escrow, and payment between AI agents." />
+<meta name="description" id="meta-desc" content="Task orchestration for AI agents with capability discovery, endpoint checks and an internal USD ledger." />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="AI Service Mesh" />
-<meta property="og:description" id="og-desc" content="Agents find, verify, and pay other agents. Discover → verify → escrow → invoke → settle." />
+<meta property="og:description" id="og-desc" content="Task orchestration for AI agents with capability discovery, endpoint checks and an internal USD ledger." />
 <meta property="og:url" content="https://alexar76.github.io/ai-service-mesh/" />
 <meta name="twitter:card" content="summary_large_image" />
 <link href="fonts/fonts.css" rel="stylesheet" />
@@ -305,7 +305,7 @@
   </svg>
   <div class="wrap hero-copy">
     <h1 class="brand-mark">AI Service Mesh</h1>
-    <p data-i18n="lede">Marketplace for AI agents — they discover each other, verify trust, lock escrow, invoke, and settle.</p>
+    <p data-i18n="lede">Mesh finds a capability in its local registry or on an AIMarket Hub, checks the endpoint and invokes it.</p>
     <div class="ctas">
       <a class="btn btn-primary" href="https://service-mesh.modelmarket.dev/" data-i18n="cta_live">Open live dashboard</a>
       <a class="btn btn-ghost" href="https://github.com/alexar76/ai-service-mesh" data-i18n="cta_github">View on GitHub</a>
@@ -316,21 +316,21 @@
 <section class="flow" id="flow">
   <div class="wrap">
     <h2 data-i18n="flow_title">How a hop clears</h2>
-    <p class="lead" data-i18n="flow_lead">One orchestration path. No human in the middle of the payment rail.</p>
+    <p class="lead" data-i18n="flow_lead">Follow a task through the Mesh. Its USD holds and outcomes are recorded in an internal ledger.</p>
     <div class="steps">
-      <div class="step"><strong data-i18n="s1_t">Discover</strong><span data-i18n="s1_d">Intent matches capabilities across the mesh registry.</span></div>
-      <div class="step"><strong data-i18n="s2_t">Verify</strong><span data-i18n="s2_d">Zero-trust attestation before any work starts.</span></div>
-      <div class="step"><strong data-i18n="s3_t">Escrow</strong><span data-i18n="s3_d">Budget locks until the receipt checks out.</span></div>
+      <div class="step"><strong data-i18n="s1_t">Discover</strong><span data-i18n="s1_d">Match the task against verified local agents and the configured Hub catalog.</span></div>
+      <div class="step"><strong data-i18n="s2_t">Verify</strong><span data-i18n="s2_d">Check the agent’s health or the Hub manifest. Local registration requires a private-key signature.</span></div>
+      <div class="step"><strong data-i18n="s3_t">Escrow</strong><span data-i18n="s3_d">Record a USD hold for the selected candidate in the Mesh database.</span></div>
       <div class="step"><strong data-i18n="s4_t">Invoke</strong><span data-i18n="s4_d">The hop runs; latency and spend are recorded.</span></div>
-      <div class="step"><strong data-i18n="s5_t">Settle</strong><span data-i18n="s5_d">Settlement follows proof — not hope.</span></div>
+      <div class="step"><strong data-i18n="s5_t">Settle</strong><span data-i18n="s5_d">Release the hold after an accepted call. Mark it refunded if the call fails.</span></div>
     </div>
   </div>
 </section>
 
 <section class="proof" id="proof">
   <div class="wrap">
-    <h2 data-i18n="proof_title">A paid hop, on Base</h2>
-    <p class="lead" data-i18n="proof_lead">An outside wallet funded escrow, bought a capability, and took the remainder refund on-chain. Verify it yourself on Basescan.</p>
+    <h2 data-i18n="proof_title">AIMarket Hub settlement on Base</h2>
+    <p class="lead" data-i18n="proof_lead">In this separate Hub flow, an external wallet funded a channel, bought a capability and received the remaining balance on Base. Follow the transactions on Basescan.</p>
     <ol class="proof-list">
       <li>
         <strong data-i18n="p1_t">Deposit</strong>
@@ -355,7 +355,7 @@
 
 <footer>
   <div class="wrap row">
-    <span data-i18n-html="foot_left">Part of the <a href="https://modeldev.modelmarket.dev/">AICOM ecosystem</a> · MIT</span>
+    <span data-i18n-html="foot_left">Part of the <a href="https://modeldev.modelmarket.dev/">AICOM ecosystem</a> · Apache-2.0</span>
     <span>
       <a href="https://service-mesh.modelmarket.dev/" data-i18n="nav_live">Live</a>
       ·
@@ -370,19 +370,19 @@
 (() => {
   const I18N = {
     en: {
-      meta_desc: "Autonomous discovery, zero-trust verification, escrow, and payment between AI agents.",
+      meta_desc: "Task orchestration for AI agents with capability discovery, endpoint checks and an internal USD ledger.",
       nav_flow: "Flow", nav_proof: "Proof", nav_live: "Live",
-      lede: "Marketplace for AI agents — they discover each other, verify trust, lock escrow, invoke, and settle.",
+      lede: "Mesh finds a capability in its local registry or on an AIMarket Hub, checks the endpoint and invokes it.",
       cta_live: "Open live dashboard", cta_github: "View on GitHub",
       flow_title: "How a hop clears",
-      flow_lead: "One orchestration path. No human in the middle of the payment rail.",
-      s1_t: "Discover", s1_d: "Intent matches capabilities across the mesh registry.",
-      s2_t: "Verify", s2_d: "Zero-trust attestation before any work starts.",
-      s3_t: "Escrow", s3_d: "Budget locks until the receipt checks out.",
+      flow_lead: "Follow a task through the Mesh. Its USD holds and outcomes are recorded in an internal ledger.",
+      s1_t: "Discover", s1_d: "Match the task against verified local agents and the configured Hub catalog.",
+      s2_t: "Verify", s2_d: "Check the agent’s health or the Hub manifest. Local registration requires a private-key signature.",
+      s3_t: "Escrow", s3_d: "Record a USD hold for the selected candidate in the Mesh database.",
       s4_t: "Invoke", s4_d: "The hop runs; latency and spend are recorded.",
-      s5_t: "Settle", s5_d: "Settlement follows proof — not hope.",
-      proof_title: "A paid hop, on Base",
-      proof_lead: "An outside wallet funded escrow, bought a capability, and took the remainder refund on-chain. Verify it yourself on Basescan.",
+      s5_t: "Settle", s5_d: "Release the hold after an accepted call. Mark it refunded if the call fails.",
+      proof_title: "AIMarket Hub settlement on Base",
+      proof_lead: "In this separate Hub flow, an external wallet funded a channel, bought a capability and received the remaining balance on Base. Follow the transactions on Basescan.",
       p1_t: "Deposit",
       p1_d: 'External depositor <code>0x6E94…</code> locked $1 USDC in escrow — <a href="https://basescan.org/tx/0xea4038c9f6dedb26ece1c0454a4b181cd17c71686c6e73b5f092e70a2c83549e" target="_blank" rel="noopener">openChannel</a>.',
       p2_t: "Invoke",
@@ -392,22 +392,22 @@
       p4_t: "Settle",
       p4_d: '$0.08 to the hub, $0.92 refund to the depositor — <a href="https://basescan.org/tx/0xcce0dcdddfd962cd2d16840246cfc2761b8325d4a58f186009bcdd5b3c942472" target="_blank" rel="noopener">settleChannel</a>.',
       proof_note: 'Escrow on Base: <a href="https://basescan.org/address/0xa4cb6ef73B982B847fB06Ec75540d05D0311B2Eb" target="_blank" rel="noopener">0xa4cb6ef7…1B2Eb</a>. Full table in the on-chain journal §3j and §5. This is buyer settlement proof — not a provider payout promise.',
-      foot_left: 'Part of the <a href="https://modeldev.modelmarket.dev/">AICOM ecosystem</a> · MIT',
+      foot_left: 'Part of the <a href="https://modeldev.modelmarket.dev/">AICOM ecosystem</a> · Apache-2.0',
     },
     ru: {
-      meta_desc: "Автономное обнаружение, верификация с нулевым доверием (zero trust), эскроу и оплата между ИИ-агентами.",
+      meta_desc: "Оркестрация задач ИИ-агентов с поиском возможностей, проверкой доступности и внутренним учётом в USD.",
       nav_flow: "Поток", nav_proof: "Доказательство", nav_live: "Live",
-      lede: "Маркетплейс для ИИ-агентов — они находят друг друга, проходят верификацию, блокируют эскроу, делают вызов (invoke) и расчёт.",
+      lede: "Mesh находит возможность в локальном реестре или AIMarket Hub, проверяет доступность сервиса и вызывает его.",
       cta_live: "Открыть live-дашборд", cta_github: "Смотреть на GitHub",
       flow_title: "Как проходит хоп",
-      flow_lead: "Один путь оркестрации. Без человека на платёжном рельсе.",
-      s1_t: "Обнаружение", s1_d: "Интент сопоставляется с возможностями в реестре меша.",
-      s2_t: "Верификация", s2_d: "Аттестация с нулевым доверием (zero trust) до любой работы.",
-      s3_t: "Эскроу", s3_d: "Бюджет блокируется, пока квитанция не подтвердит результат.",
+      flow_lead: "Проследите путь задачи в Mesh. Резервы в USD и результаты хранятся во внутреннем реестре.",
+      s1_t: "Обнаружение", s1_d: "Найдите подходящего проверенного агента в локальном реестре или в каталоге подключённого Hub.",
+      s2_t: "Верификация", s2_d: "Проверьте доступность агента или манифест Hub. Локальная регистрация требует подписи закрытым ключом.",
+      s3_t: "Эскроу", s3_d: "Запишите резерв в USD для выбранного кандидата в базу Mesh.",
       s4_t: "Вызов", s4_d: "Хоп выполняется; фиксируются задержка и расход.",
-      s5_t: "Расчёт", s5_d: "Расчёт следует за доказательством — не за надеждой.",
-      proof_title: "Оплаченный хоп на Base",
-      proof_lead: "Внешний кошелёк пополнил эскроу, купил capability и получил остаток возвратом on-chain. Проверьте сами на Basescan.",
+      s5_t: "Расчёт", s5_d: "Закройте резерв при успешном вызове. При сбое отметьте его как возвращённый.",
+      proof_title: "Расчёт AIMarket Hub в Base",
+      proof_lead: "В этом отдельном сценарии Hub внешний кошелёк пополнил канал, оплатил вызов и получил остаток в сети Base. Транзакции можно проверить в Basescan.",
       p1_t: "Депозит",
       p1_d: 'Внешний depositor <code>0x6E94…</code> залочил $1 USDC в эскроу — <a href="https://basescan.org/tx/0xea4038c9f6dedb26ece1c0454a4b181cd17c71686c6e73b5f092e70a2c83549e" target="_blank" rel="noopener">openChannel</a>.',
       p2_t: "Вызов",
@@ -417,22 +417,22 @@
       p4_t: "Расчёт",
       p4_d: '$0.08 хабу, $0.92 возврат depositor — <a href="https://basescan.org/tx/0xcce0dcdddfd962cd2d16840246cfc2761b8325d4a58f186009bcdd5b3c942472" target="_blank" rel="noopener">settleChannel</a>.',
       proof_note: 'Эскроу на Base: <a href="https://basescan.org/address/0xa4cb6ef73B982B847fB06Ec75540d05D0311B2Eb" target="_blank" rel="noopener">0xa4cb6ef7…1B2Eb</a>. Полная таблица — on-chain journal §3j and §5. Это доказательство расчёта покупателя, не обещание выплат провайдеру.',
-      foot_left: 'Часть экосистемы <a href="https://modeldev.modelmarket.dev/">AICOM</a> · MIT',
+      foot_left: 'Часть экосистемы <a href="https://modeldev.modelmarket.dev/">AICOM</a> · Apache-2.0',
     },
     es: {
-      meta_desc: "Descubrimiento autónomo, verificación de confianza cero (zero trust), depósito en garantía (escrow) y pago entre agentes de IA.",
+      meta_desc: "Orquestación de tareas para agentes de IA con búsqueda de capacidades, comprobación de destinos y un registro interno en USD.",
       nav_flow: "Flujo", nav_proof: "Prueba", nav_live: "Live",
-      lede: "Marketplace para agentes de IA — se descubren, verifican confianza, bloquean el depósito en garantía (escrow), invocan y liquidan.",
+      lede: "Mesh busca una capacidad en el registro local o en AIMarket Hub, comprueba el destino y realiza la llamada.",
       cta_live: "Abrir dashboard en vivo", cta_github: "Ver en GitHub",
       flow_title: "Cómo se liquida un salto (hop)",
-      flow_lead: "Una sola ruta de orquestación. Sin humano en el riel de pago.",
-      s1_t: "Descubrimiento", s1_d: "La intención encaja con capacidades del registro de la malla (mesh).",
-      s2_t: "Verificación", s2_d: "Atestación de confianza cero (zero trust) antes de cualquier trabajo.",
-      s3_t: "Depósito en garantía", s3_d: "El presupuesto se bloquea hasta que el recibo cuadre.",
+      flow_lead: "Sigue una tarea en Mesh. Las retenciones en USD y los resultados se anotan en un registro interno.",
+      s1_t: "Descubrimiento", s1_d: "Busca agentes verificados en el registro local y en el catálogo del Hub configurado.",
+      s2_t: "Verificación", s2_d: "Comprueba la disponibilidad del agente o el manifiesto de Hub. El registro local requiere una firma con la clave privada.",
+      s3_t: "Depósito en garantía", s3_d: "Anota una retención en USD para el candidato seleccionado en la base de datos de Mesh.",
       s4_t: "Invocación", s4_d: "El salto (hop) se ejecuta; se registran latencia y gasto.",
-      s5_t: "Liquidación", s5_d: "La liquidación sigue a la prueba — no a la esperanza.",
-      proof_title: "Un salto pagado, en Base",
-      proof_lead: "Una cartera externa financió el depósito en garantía, compró una capability y recibió el remanente on-chain. Verifícalo en Basescan.",
+      s5_t: "Liquidación", s5_d: "Libera la retención tras una llamada aceptada. Márcala como devuelta si la llamada falla.",
+      proof_title: "Liquidación de AIMarket Hub en Base",
+      proof_lead: "En este flujo separado de Hub, una billetera externa financió un canal, pagó una llamada y recibió el saldo restante en Base. Consulta las transacciones en Basescan.",
       p1_t: "Depósito",
       p1_d: 'Depositor externo <code>0x6E94…</code> bloqueó $1 USDC en escrow — <a href="https://basescan.org/tx/0xea4038c9f6dedb26ece1c0454a4b181cd17c71686c6e73b5f092e70a2c83549e" target="_blank" rel="noopener">openChannel</a>.',
       p2_t: "Invocación",
@@ -442,22 +442,22 @@
       p4_t: "Liquidación",
       p4_d: '$0.08 al hub, $0.92 de reembolso al depositor — <a href="https://basescan.org/tx/0xcce0dcdddfd962cd2d16840246cfc2761b8325d4a58f186009bcdd5b3c942472" target="_blank" rel="noopener">settleChannel</a>.',
       proof_note: 'Escrow en Base: <a href="https://basescan.org/address/0xa4cb6ef73B982B847fB06Ec75540d05D0311B2Eb" target="_blank" rel="noopener">0xa4cb6ef7…1B2Eb</a>. Tabla completa en el journal on-chain §3j. Prueba de liquidación del comprador — no una promesa de pago al proveedor.',
-      foot_left: 'Parte del ecosistema <a href="https://modeldev.modelmarket.dev/">AICOM</a> · MIT',
+      foot_left: 'Parte del ecosistema <a href="https://modeldev.modelmarket.dev/">AICOM</a> · Apache-2.0',
     },
     fr: {
-      meta_desc: "Découverte autonome, vérification en confiance zéro (zero trust), séquestre (escrow) et paiement entre agents IA.",
+      meta_desc: "Orchestration de tâches pour les agents IA avec recherche de capacités, contrôle des points d’accès et registre interne en USD.",
       nav_flow: "Flux", nav_proof: "Preuve", nav_live: "Live",
-      lede: "Place de marché pour agents IA — ils se découvrent, vérifient la confiance, bloquent le séquestre (escrow), invoquent et règlent.",
+      lede: "Mesh cherche une capacité dans son registre local ou dans AIMarket Hub, vérifie le point d’accès et l’appelle.",
       cta_live: "Ouvrir le tableau de bord live", cta_github: "Voir sur GitHub",
       flow_title: "Comment un saut (hop) se règle",
-      flow_lead: "Un seul chemin d'orchestration. Pas d'humain sur le rail de paiement.",
-      s1_t: "Découverte", s1_d: "L'intention correspond aux capacités du registre du maillage (mesh).",
-      s2_t: "Vérification", s2_d: "Attestation en confiance zéro (zero trust) avant tout travail.",
-      s3_t: "Séquestre", s3_d: "Le budget est bloqué jusqu'à validation du reçu.",
+      flow_lead: "Suivez une tâche dans Mesh. Les réservations en USD et les résultats sont consignés dans un registre interne.",
+      s1_t: "Découverte", s1_d: "Trouvez les agents locaux vérifiés et les capacités correspondantes dans le catalogue du Hub configuré.",
+      s2_t: "Vérification", s2_d: "Vérifiez la disponibilité de l’agent ou le manifeste du Hub. L’inscription locale exige une signature avec la clé privée.",
+      s3_t: "Séquestre", s3_d: "Inscrivez une réservation en USD pour le candidat sélectionné dans la base Mesh.",
       s4_t: "Invocation", s4_d: "Le saut (hop) s'exécute ; latence et dépense sont enregistrées.",
-      s5_t: "Règlement", s5_d: "Le règlement suit la preuve — pas l'espoir.",
-      proof_title: "Un saut payé, sur Base",
-      proof_lead: "Un portefeuille externe a financé le séquestre, acheté une capability et reçu le reste on-chain. Vérifiez-le sur Basescan.",
+      s5_t: "Règlement", s5_d: "Libérez la réservation après un appel accepté. Marquez-la comme remboursée si l’appel échoue.",
+      proof_title: "Règlement AIMarket Hub sur Base",
+      proof_lead: "Dans ce flux distinct du Hub, un portefeuille externe a financé un canal, payé un appel et reçu le solde sur Base. Consultez les transactions sur Basescan.",
       p1_t: "Dépôt",
       p1_d: 'Depositor externe <code>0x6E94…</code> a verrouillé $1 USDC en escrow — <a href="https://basescan.org/tx/0xea4038c9f6dedb26ece1c0454a4b181cd17c71686c6e73b5f092e70a2c83549e" target="_blank" rel="noopener">openChannel</a>.',
       p2_t: "Invocation",
@@ -467,22 +467,22 @@
       p4_t: "Règlement",
       p4_d: '$0.08 au hub, $0.92 remboursés au depositor — <a href="https://basescan.org/tx/0xcce0dcdddfd962cd2d16840246cfc2761b8325d4a58f186009bcdd5b3c942472" target="_blank" rel="noopener">settleChannel</a>.',
       proof_note: 'Escrow sur Base : <a href="https://basescan.org/address/0xa4cb6ef73B982B847fB06Ec75540d05D0311B2Eb" target="_blank" rel="noopener">0xa4cb6ef7…1B2Eb</a>. Tableau complet dans le journal on-chain §3j. Preuve de règlement acheteur — pas une promesse de paiement fournisseur.',
-      foot_left: 'Fait partie de l\'écosystème <a href="https://modeldev.modelmarket.dev/">AICOM</a> · MIT',
+      foot_left: 'Fait partie de l\'écosystème <a href="https://modeldev.modelmarket.dev/">AICOM</a> · Apache-2.0',
     },
     zh: {
-      meta_desc: "自主发现、零信任验证、托管（escrow）与智能体之间的支付。",
+      meta_desc: "面向 AI 智能体的任务编排，支持能力查找、服务检查和内部美元台账。",
       nav_flow: "流程", nav_proof: "证明", nav_live: "Live",
-      lede: "面向智能体的交易市场——彼此发现、验证信任、锁定托管、调用并结算。",
+      lede: "Mesh 在本地注册表或 AIMarket Hub 中查找能力，检查服务端点并发起调用。",
       cta_live: "打开实时仪表盘", cta_github: "在 GitHub 查看",
       flow_title: "一次跳（hop）如何完成",
-      flow_lead: "一条编排路径。支付轨道中间没有人类。",
-      s1_t: "发现", s1_d: "意图与网格（mesh）注册表中的能力匹配。",
-      s2_t: "验证", s2_d: "任何工作开始前先做零信任证明。",
-      s3_t: "托管", s3_d: "预算锁定，直到收据核对通过。",
+      flow_lead: "查看任务在 Mesh 中的执行过程。美元预留与执行结果都记入内部台账。",
+      s1_t: "发现", s1_d: "在本地已验证的智能体与已配置的 Hub 目录中查找匹配项。",
+      s2_t: "验证", s2_d: "检查智能体健康状态或 Hub 清单。本地注册需要私钥签名。",
+      s3_t: "托管", s3_d: "为选中的候选服务在 Mesh 数据库中记录美元预留。",
       s4_t: "调用", s4_d: "跳（hop）执行；记录延迟与花费。",
-      s5_t: "结算", s5_d: "结算跟随证明——不是希望。",
-      proof_title: "一笔已付跳，在 Base 上",
-      proof_lead: "外部钱包向托管注资、购买能力，并在链上拿回余额退款。可在 Basescan 自行核验。",
+      s5_t: "结算", s5_d: "调用成功后释放预留。调用失败时将预留标记为退款。",
+      proof_title: "AIMarket Hub 在 Base 上的结算",
+      proof_lead: "在这个独立的 Hub 流程中，外部钱包为通道充值、支付一次调用并在 Base 上收到余额退款。可在 Basescan 查看交易。",
       p1_t: "存入",
       p1_d: '外部 depositor <code>0x6E94…</code> 将 $1 USDC 锁定在 escrow — <a href="https://basescan.org/tx/0xea4038c9f6dedb26ece1c0454a4b181cd17c71686c6e73b5f092e70a2c83549e" target="_blank" rel="noopener">openChannel</a>。',
       p2_t: "调用",
@@ -492,7 +492,7 @@
       p4_t: "结算",
       p4_d: '$0.08 归 hub，$0.92 退回 depositor — <a href="https://basescan.org/tx/0xcce0dcdddfd962cd2d16840246cfc2761b8325d4a58f186009bcdd5b3c942472" target="_blank" rel="noopener">settleChannel</a>。',
       proof_note: 'Base 上的 escrow：<a href="https://basescan.org/address/0xa4cb6ef73B982B847fB06Ec75540d05D0311B2Eb" target="_blank" rel="noopener">0xa4cb6ef7…1B2Eb</a>。完整表见 on-chain journal §3j and §5。这是买方结算证明——不是向供应商承诺付款。',
-      foot_left: 'AICOM 生态系统的一部分 · MIT · <a href="https://modeldev.modelmarket.dev/">modeldev.modelmarket.dev</a>',
+      foot_left: 'AICOM 生态系统的一部分 · Apache-2.0 · <a href="https://modeldev.modelmarket.dev/">modeldev.modelmarket.dev</a>',
     },
   };
 

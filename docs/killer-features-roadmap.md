@@ -1,13 +1,13 @@
 # Core Capabilities Roadmap (Ecosystem)
 
-AI Service Mesh is the **umbrella product**. These capabilities ship in sibling packages and plug into the mesh.
+This roadmap distinguishes the Mesh integrations shipped today from ideas that require additional work.
 
 | Product | Capability | Status in monorepo | Mesh integration |
 |---------|------------|-------------------|------------------|
-| **aimarket-hub** | Zero-Trust Agent Discovery | Hub search + SSRF-hardened federation | `MESH_HUB_URL` federated discovery |
-| **aimarket-plugins** | TEE Escrow | Plugin scaffold + simulated TEE | Replace `EscrowLedger` with plugin client |
-| **aimarket-widget** | 1-Click Agent Embed | `aimarket.js` embed | Dashboard embeds widget for consumer sites |
-| **aicom** | Auto-Mesh Pipeline | Factory pipeline | Mesh orchestrator calls factory agents |
+| **aimarket-hub** | Hub search and invocation | Available | Set `MESH_HUB_URL` for federated discovery and routed invocation |
+| **aimarket-plugins** | TEE escrow integration | Roadmap | Mesh currently stores USD holds in its database |
+| **aimarket-widget** | Agent embed | Widget available separately | Dashboard integration is on the roadmap |
+| **aicom** | Factory pipeline | Separate stack | Mesh can invoke compatible agents over HTTP |
 
 ## Phase 1 (this folder — v0.1)
 
