@@ -80,6 +80,15 @@ def test_insecure_defaults_documented():
 
 # ── client_ip behind a proxy (SEC-08, revisited 2026-09-11) ────────────────────────
 
+def _nets(raw):
+    from ai_service_mesh.security import parse_trusted_proxies
+
+    return parse_trusted_proxies(raw)
+
+
+_PROXY = _nets("10.0.0.0/8")
+
+
 class _Req:
     def __init__(self, xff, peer="10.0.0.2"):
         self.headers = {"x-forwarded-for": xff} if xff is not None else {}
@@ -95,7 +104,7 @@ def test_forwarded_chain_is_read_from_the_right():
     from ai_service_mesh.security import client_ip
 
     req = _Req("1.2.3.4, 5.6.7.8, 203.0.113.9")
-    assert client_ip(req, trust_forwarded=True) == "203.0.113.9"
+    assert client_ip(req, trust_forwarded=True, trusted_proxies=_PROXY) == "203.0.113.9"
 
 
 def test_forged_forwarded_header_cannot_choose_the_bucket():
@@ -104,7 +113,7 @@ def test_forged_forwarded_header_cannot_choose_the_bucket():
     real = "203.0.113.9"
     for forged in ("1.1.1.1", "1.1.1.1, 2.2.2.2", " , ,"):
         req = _Req(f"{forged}, {real}")
-        assert client_ip(req, trust_forwarded=True) == real
+        assert client_ip(req, trust_forwarded=True, trusted_proxies=_PROXY) == real
 
 
 def test_forwarded_header_is_ignored_unless_trusted():
@@ -117,5 +126,28 @@ def test_forwarded_header_is_ignored_unless_trusted():
 def test_empty_forwarded_header_falls_back_to_the_peer():
     from ai_service_mesh.security import client_ip
 
-    assert client_ip(_Req("", peer="10.0.0.7"), trust_forwarded=True) == "10.0.0.7"
-    assert client_ip(_Req(None, peer="10.0.0.7"), trust_forwarded=True) == "10.0.0.7"
+    assert client_ip(_Req("", peer="10.0.0.7"), trust_forwarded=True, trusted_proxies=_PROXY) == "10.0.0.7"
+    assert client_ip(_Req(None, peer="10.0.0.7"), trust_forwarded=True, trusted_proxies=_PROXY) == "10.0.0.7"
+
+
+def test_forwarded_header_from_a_peer_that_is_not_a_proxy_is_ignored():
+    """MOMUS code finding mom-fa8250468f2c4d5a (2026-11-16): the flag alone let a direct caller pick its bucket."""
+    from ai_service_mesh.security import client_ip
+
+    for forged in ("1.1.1.1", "2.2.2.2, 3.3.3.3"):
+        req = _Req(forged, peer="198.51.100.7")
+        assert client_ip(req, trust_forwarded=True, trusted_proxies=_PROXY) == "198.51.100.7"
+    # trusted with no proxies configured trusts nobody
+    assert client_ip(_Req("1.1.1.1", peer="10.0.0.2"), trust_forwarded=True) == "10.0.0.2"
+
+
+def test_trusted_proxies_setting_parses_and_rejects_garbage():
+    import pytest
+
+    from ai_service_mesh.config import Settings
+
+    nets = _nets(Settings().trusted_proxies)
+    assert [str(n) for n in nets] == ["127.0.0.1/32", "::1/128"]
+    assert [str(n) for n in _nets(" 172.16.0.0/12 , ,10.1.2.3")] == ["172.16.0.0/12", "10.1.2.3/32"]
+    with pytest.raises(ValueError):
+        _nets("172.16.0.0/12,not-a-net")

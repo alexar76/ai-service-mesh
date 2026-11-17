@@ -58,6 +58,8 @@ class Settings(BaseSettings):
     # Security hardening knobs
     allow_ui_writes: bool = False  # SEC-01: browser BFF /v1/ui/tasks fail-closed by default
     trust_forwarded_for: bool = False  # SEC-08: only honor X-Forwarded-For behind a trusted proxy
+    # SEC-08: the socket peers whose X-Forwarded-For counts (CIDRs). Default: same-host proxy only.
+    trusted_proxies: str = "127.0.0.1/32,::1/128"
     public_read: bool = True  # SEC-08b: when False, read endpoints require MESH_API_TOKEN
     health_verbose: bool = False  # SEC-10: expose backend/internal details on /health
     # Largest agent/hub reply the mesh will buffer. httpx's .json() reads the whole body

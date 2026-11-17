@@ -41,6 +41,12 @@ services:
       # $proxy_add_x_forwarded_for. Without this the limiter keyed every request on the
       # proxy's address — one 120/min bucket for the whole internet.
       MESH_TRUST_FORWARDED_FOR: "1"
+      # Whose X-Forwarded-For counts. nginx on the host reaches the container through the
+      # published loopback port, so the peer the app sees is this compose network's gateway
+      # (172.20.0.1 on factory-vps, 2026-11-16), inside Docker's default 172.16.0.0/12 pool.
+      # Every container on a host bridge is in that range as well; set the gateway's /32 in
+      # ./.env to narrow it.
+      MESH_TRUSTED_PROXIES: ${MESH_TRUSTED_PROXIES:-172.16.0.0/12}
       # Largest agent/hub reply the mesh will buffer (bytes). See config.max_response_bytes.
       MESH_MAX_RESPONSE_BYTES: ${MESH_MAX_RESPONSE_BYTES:-1048576}
       MESH_DATA_DIR: /data

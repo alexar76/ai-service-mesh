@@ -210,12 +210,29 @@ class RateLimiter:
             self._prune_stale_keys(now)
 
 
-def client_ip(request: Request, *, trust_forwarded: bool = False) -> str:
+def parse_trusted_proxies(raw: str) -> tuple:
+    """MESH_TRUSTED_PROXIES: comma-separated CIDRs. A malformed entry raises (fail at startup)."""
+    return tuple(ipaddress.ip_network(part.strip(), strict=False) for part in (raw or "").split(",") if part.strip())
+
+
+def _peer_is_trusted_proxy(peer: str | None, trusted_proxies: tuple) -> bool:
+    if not peer:
+        return False
+    try:
+        ip = ipaddress.ip_address(peer)
+    except ValueError:
+        return False
+    return any(ip in net for net in trusted_proxies)
+
+
+def client_ip(request: Request, *, trust_forwarded: bool = False, trusted_proxies: tuple = ()) -> str:
     """Resolve the address the rate limiter buckets on.
 
     X-Forwarded-For is attacker-controlled unless the app sits behind a reverse proxy,
-    so it is honoured only when MESH_TRUST_FORWARDED_FOR is set (SEC-08). Two things
-    about the trusted case that the first version got wrong:
+    so it is honoured only when MESH_TRUST_FORWARDED_FOR is set (SEC-08) AND the socket
+    peer is one of MESH_TRUSTED_PROXIES (MOMUS code finding mom-fa8250468f2c4d5a,
+    2026-11-16: with the flag alone, anyone who reached the port directly chose their
+    own bucket). Two things about the trusted case that the first version got wrong:
 
     * Read the chain from the RIGHT. nginx sets the header with
       ``$proxy_add_x_forwarded_for``, which APPENDS the peer it saw to whatever the
@@ -228,11 +245,10 @@ def client_ip(request: Request, *, trust_forwarded: bool = False) -> str:
       public API for everyone. The production overlay now sets the flag; this function
       is what makes setting it safe.
     """
-    if trust_forwarded:
+    peer = request.client.host if request.client else None
+    if trust_forwarded and _peer_is_trusted_proxy(peer, trusted_proxies):
         forwarded = request.headers.get("x-forwarded-for", "")
         hops = [h.strip() for h in forwarded.split(",") if h.strip()]
         if hops:
             return hops[-1][:64]
-    if request.client:
-        return request.client.host
-    return "unknown"
+    return peer or "unknown"

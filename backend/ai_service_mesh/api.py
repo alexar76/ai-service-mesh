@@ -31,6 +31,7 @@ from ai_service_mesh.security import (
     RateLimiter,
     assert_production_tokens,
     client_ip,
+    parse_trusted_proxies,
     require_bearer,
     url_is_safe_async,
 )
@@ -108,8 +109,11 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
         allow_headers=["Content-Type", "Authorization"],
     )
 
+    trusted_proxies = parse_trusted_proxies(settings.trusted_proxies)
+
     def _rate(request: Request) -> None:
-        limiter.check(client_ip(request, trust_forwarded=settings.trust_forwarded_for))
+        limiter.check(client_ip(request, trust_forwarded=settings.trust_forwarded_for,
+                                trusted_proxies=trusted_proxies))
 
     def _require_api(authorization: str, *, write: bool = False) -> None:
         if not settings.api_token:

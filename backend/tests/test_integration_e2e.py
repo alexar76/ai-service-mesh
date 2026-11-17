@@ -69,7 +69,20 @@ def _http_json(method, url, body=None, headers=None):
 
 
 @pytest.fixture(scope="module", autouse=True)
-def ensure_real_agent():
+def ensure_mesh():
+    """These tests need a running mesh on MESH_API_URL. Something else may hold the port (on a developer Mac,
+    2026-11-16, :8090 was another project's container answering {"status": "ok"}); asserting against it reported
+    two mesh failures that were not the mesh's."""
+    try:
+        code, data = _http_json("GET", f"{MESH_API}/health")
+    except Exception as exc:  # noqa: BLE001 - nothing listening is a skip, not a failure
+        pytest.skip(f"no mesh on {MESH_API} ({type(exc).__name__})")
+    if code != 200 or not isinstance(data, dict) or data.get("service") != "ai-service-mesh":
+        pytest.skip(f"{MESH_API} is not an ai-service-mesh (health: {str(data)[:80]})")
+
+
+@pytest.fixture(scope="module", autouse=True)
+def ensure_real_agent(ensure_mesh):
     started = False
     proc = None
     try:

@@ -7,7 +7,7 @@
 | Direct preflight and invocation | Mesh checks and pins the resolved address on each connection, rejects redirects and bounds response bodies. |
 | Server API | Task submission requires the API bearer token in every environment. Set `MESH_PUBLIC_READ=0` to protect task, registry, stats and activity reads. |
 | Browser task submission | Off by default. Explicitly enable it only behind an authenticated proxy. The origin allowlist adds a browser guard. |
-| Network exposure | The production overlay binds the API to loopback. Forwarded addresses are trusted only when `MESH_TRUST_FORWARDED_FOR=1`. Configure a trusted edge before enabling that setting. |
+| Network exposure | The production overlay binds the API to loopback. Forwarded addresses are trusted only when `MESH_TRUST_FORWARDED_FOR=1` and the socket peer is in `MESH_TRUSTED_PROXIES` (CIDRs, default loopback). Configure a trusted edge before enabling that setting. |
 | Rate limiting | The API keeps a per-IP limiter in process. |
 | Tokens | Production startup rejects empty and known default tokens unless the insecure-default override is set. A known compromised token is rejected independently of that override. |
 
